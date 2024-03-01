@@ -1,9 +1,11 @@
 ﻿using Auth0.AspNetCore.Authentication;
+using Auth0.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Auth0.Controllers
 {
@@ -28,6 +30,18 @@ namespace Auth0.Controllers
             await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
         }
 
+        [Authorize]
+        public IActionResult Profile()
+        {
+            var userProfile = new UserProfile
+            {
+                Name = User.Identity.Name,
+                EmailAddress = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
+                ProfileImage = User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value
+            };
+
+            return View(userProfile);
+        }
 
         [Authorize]
         public async Task Logout()
@@ -44,6 +58,10 @@ namespace Auth0.Controllers
         {
             return View();
         }
-        
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
     }
 }
