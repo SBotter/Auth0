@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Auth0.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class AccountController : Controller
     {
         public async Task Login(string returnUrl = "/")
@@ -20,6 +18,17 @@ namespace Auth0.Controllers
             await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
         }
 
+        public async Task Signup(string returnUrl = "/")
+        {
+            var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
+                .WithParameter("screen_hint", "signup")
+                .WithRedirectUri(returnUrl)
+                .Build();
+
+            await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+        }
+
+
         [Authorize]
         public async Task Logout()
         {
@@ -30,5 +39,6 @@ namespace Auth0.Controllers
             await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
+        
     }
 }
